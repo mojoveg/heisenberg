@@ -39,6 +39,12 @@
         <div class="container">
             <div class="content">
                 <div class="title">Laravel 5</div>
+
+            <form action="{{ route('DCimportAccounts') }}" method="get">
+                <button type="submit" class="btn btn-primary">Test DC Import</button>
+                <input type="hidden" value="{{ Session::token() }}" name="_token">
+            </form>
+
             </div>
         </div>
     </body>

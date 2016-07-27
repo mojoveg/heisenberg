@@ -18,3 +18,9 @@ Route::get('/', function () {
 Route::get('about', function () {
     return view('about');
 });
+
+
+Route::get('/DCimportAccounts', [
+	'uses' => 'DinersClubController@importAccounts',
+	'as' => 'DCimportAccounts'
+]);
