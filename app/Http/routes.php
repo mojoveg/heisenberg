@@ -24,3 +24,6 @@ Route::get('/DCimportAccounts', [
 	'uses' => 'DinersClubController@importAccounts',
 	'as' => 'DCimportAccounts'
 ]);
+Route::auth();
+
+Route::get('/home', 'HomeController@index');
