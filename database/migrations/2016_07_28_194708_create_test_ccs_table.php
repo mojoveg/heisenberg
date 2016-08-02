@@ -15,6 +15,11 @@ class CreateTestCcsTable extends Migration
         Schema::create('test_ccs', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
+            $table->string('accountnum', 100);
+            $table->string('accountnum1', 100);
+            $table->string('accountnum2', 100);
+            $table->string('accountnum3', 100);
+
         });
     }
 
