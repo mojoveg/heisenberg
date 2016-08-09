@@ -30,6 +30,10 @@ Route::get('/testccs', [
 	'as' => 'testccs'
 ]);
 
+Route::get('/test1', [
+	'uses' => 'testController@test1',
+	'as' => 'test1'
+]);
 
 Route::auth();
 
