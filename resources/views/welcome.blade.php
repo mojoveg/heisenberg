@@ -10,6 +10,12 @@
                 <div class="panel-body">
                     Your Application's Landing Page.
                 </div>
+                <div class="panel-body">
+                    <a href="{{ url('/testCC') }}">Test CC</a>
+                </div>
+                <div class="panel-body">
+                    <a href="{{ url('/chargeFuel') }}">Charge Fuel</a>
+                </div>
             </div>
         </div>
     </div>

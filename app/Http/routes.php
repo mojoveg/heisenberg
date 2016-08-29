@@ -38,3 +38,6 @@ Route::get('/test1', [
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
+
+
+Route::get('testCC', function(){ return view('testCC');});

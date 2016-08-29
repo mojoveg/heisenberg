@@ -22,8 +22,13 @@ class testController extends Controller
 		(accountnum, accountnum1, accountnum2, accountnum3)
 
 		SELECT accountnum, AES_ENCRYPT(accountnum, "e9NzdyXgPUDlIFo6cvuaRiQ0QdsIv+QlqpLsvqkrNhE=")
-		, "'. $var .'", "'. $var  .'"
+		, "'. $var .'", "'. $var  .'" 
 		FROM dinners_club_accounts
 		');    	
+    }
+
+    public function chargeFuel()
+    {
+    	# code...
     }
 }
