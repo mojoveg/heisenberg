@@ -41,3 +41,8 @@ Route::get('/home', 'HomeController@index');
 
 
 Route::get('testCC', function(){ return view('testCC');});
+
+Route::get('testCCcv', 'testController@testCC');
+
+
+Route::get('printDump', function () { return view('printDump'); });

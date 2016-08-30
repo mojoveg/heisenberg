@@ -11,7 +11,10 @@
                     Your Application's Landing Page.
                 </div>
                 <div class="panel-body">
-                    <a href="{{ url('/testCC') }}">Test CC</a>
+                    <a href="{{ url('/testCC') }}">Test CC php</a>
+                </div>
+                <div class="panel-body">
+                    <a href="{{ url('/testCCcv') }}">Test CC controller/view</a>
                 </div>
                 <div class="panel-body">
                     <a href="{{ url('/chargeFuel') }}">Charge Fuel</a>
