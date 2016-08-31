@@ -148,7 +148,8 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 Way\Generators\GeneratorsServiceProvider::class,
-Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,        
+Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,  
+Barryvdh\Debugbar\ServiceProvider::class,      
 
         /*
          * Application Service Providers...
@@ -203,6 +204,7 @@ Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+'Debugbar' => Barryvdh\Debugbar\Facade::class,
 
     ],
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use DB;
+#use Vendor\CybsSoapClient;
 
 class testController extends Controller
 {
@@ -31,8 +32,12 @@ class testController extends Controller
     {
 		require_once base_path('vendor/autoload.php');
 
+		require_once base_path('vendor/cybersource/sdk-php/lib/CybsSoapClient.php');
+
 		$referenceCode = 'hopeisthethingwithfeathers';
-		$client = new CybsSoapClient();
+		#$client = new CybsSoapClient();
+$client = CybsSoapClient::create();
+
 		$request = $client->createRequest($referenceCode);
 		// Build a sale request (combining an auth and capture). In this example only
 		// the amount is provided for the purchase total.
