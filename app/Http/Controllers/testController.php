@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use DB;
 #use Vendor\CybsSoapClient;
+use CybsSoapClient;
+use stdClass;
 
 class testController extends Controller
 {
@@ -30,13 +32,15 @@ class testController extends Controller
 
     public function testCC()
     {
-		require_once base_path('vendor/autoload.php');
+		#require_once base_path('vendor/autoload.php');
 
-		require_once base_path('vendor/cybersource/sdk-php/lib/CybsSoapClient.php');
+		#require_once base_path('vendor/cybersource/sdk-php/lib/CybsSoapClient.php');
+		#require_once (dirname(dirname(__FILE__)) . '/cybersource/sdk-php/lib/CybsSoapClient.php');
 
 		$referenceCode = 'hopeisthethingwithfeathers';
-		#$client = new CybsSoapClient();
-$client = CybsSoapClient::create();
+		$client = new CybsSoapClient();
+#		$client = new \Vendor\CybsSoapClient();
+#$client = CybsSoapClient::create();
 
 		$request = $client->createRequest($referenceCode);
 		// Build a sale request (combining an auth and capture). In this example only
@@ -75,5 +79,10 @@ $client = CybsSoapClient::create();
     public function chargeFuel()
     {
     	# code...
+    }
+
+    public function testRedirect()
+    {
+    	return redirect()->route('about');
     }
 }

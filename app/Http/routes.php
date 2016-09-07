@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::get('about', function () {
     return view('about');
-});
+})->name('about');
 
 
 Route::get('/DCimportAccounts', [
@@ -45,4 +45,6 @@ Route::get('testCC', function(){ return view('testCC');});
 Route::get('testCCcv', 'testController@testCC');
 
 
-Route::get('printDump', function () { return view('printDump'); });
+Route::get('printDump', function () { return view('printDump'); })->name('printDump');
+
+Route::get('testRedirect', 'testController@testRedirect' );
