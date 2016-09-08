@@ -19,6 +19,9 @@
                 <div class="panel-body">
                     <a href="{{ url('/chargeFuel') }}">Charge Fuel</a>
                 </div>
+                <div class="panel-body">
+                    <a href="{{ url('/gambino') }}">Gambino</a>
+                </div>
             </div>
         </div>
     </div>

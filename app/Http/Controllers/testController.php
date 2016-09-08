@@ -83,6 +83,16 @@ class testController extends Controller
 
     public function testRedirect()
     {
-    	return redirect()->route('about');
+    	// return redirect()->route('about');
+		return redirect()->route('printDump')->with(['reply' => ["foo" => "bar","bar" => "foo",] ]);
+    }
+
+    public function gambino()
+    {
+    	$typeOfInvoices = DB::connection('mysql_motor')->select('SELECT typeOfInvoice, userShow FROM SIInvoiceTypes ORDER BY sortOrder DESC, typeOfInvoice');
+
+    	// return $typeOfInvoices;
+
+    	return view('gambino.index', ['typeOfInvoices' => $typeOfInvoices]);
     }
 }

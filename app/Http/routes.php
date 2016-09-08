@@ -45,6 +45,13 @@ Route::get('testCC', function(){ return view('testCC');});
 Route::get('testCCcv', 'testController@testCC');
 
 
-Route::get('printDump', function () { return view('printDump'); })->name('printDump');
+Route::get('printDump', function () { 
+	// return view('printDump', ['reply' => '']); 
+	return view('printDump'); 
+})->name('printDump');
 
 Route::get('testRedirect', 'testController@testRedirect' );
+
+// Route::get('gambino', function(){ return view('gambino/index');});
+
+Route::get('gambino', 'testController@gambino');

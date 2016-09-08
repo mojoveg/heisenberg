@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
         <pre>
-        {{ $reply }}
-        </pre>; 
+        {{ $reply or 'Default'}}
+        </pre> 
 </div>
 @endsection
