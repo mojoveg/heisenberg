@@ -54,4 +54,25 @@ Route::get('testRedirect', 'testController@testRedirect' );
 
 // Route::get('gambino', function(){ return view('gambino/index');});
 
-Route::get('gambino', 'testController@gambino');
+// Route::get('gambino', [
+// 	'uses' => 'testController@gambino',
+// 	'as' => 'gambino'
+// ]);
+
+Route::get('gambino', [
+	'uses' => 'testController@gambinoPost',
+	'as' => 'gambino'
+]);
+
+Route::post('gambino', [
+	'uses' => 'testController@gambinoPost',
+	'as' => 'gambino'
+]);
+
+Route::post('gambino2', 'testController@gambino2');
+
+Route::get('gambino2', 'testController@gambino2');
+
+Route::get('gambino3', 'testController@gambino3');
+
+Route::post('gambino3/bill', 'testController@gambino3Bill');
