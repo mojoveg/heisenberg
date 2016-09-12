@@ -20,7 +20,7 @@
                     <a href="{{ url('/chargeFuel') }}">Charge Fuel</a>
                 </div>
                 <div class="panel-body">
-                    <a href="{{ url('/gambino') }}">Gambino</a>
+                    <a href="{{ url('/gambino3') }}">Gambino</a>
                 </div>
             </div>
         </div>
