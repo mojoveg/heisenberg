@@ -128,9 +128,9 @@ class testController extends Controller
 
     	$sTesting = 'FALSE';
 
-    	$sTypeHold = 'Fuel';
+    	$sTypeHold = 'Rental';
     	$userID = 43;
-    	$sSIRun = 1248;
+    	$sSIRun = 1249;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -195,37 +195,38 @@ class testController extends Controller
  			'LIMIT 1 ';
 	    	$sql = DB::connection('mysql_motor')->update($sSQL);
 
+	    	if($sTypeHold == "Fuel"){
+	 			$sSQL = 
+	 			'INSERT INTO motor_heisenberg.fuel_gasbuddy  '.
+	 			'(site, tran, keyIn, veh, dept, emp, dept2, DATE, TIME, pu, pr, ta, trans, cum_veh,  '.
+	 			'cum_emp, odom, miles, err, filename, counter, paid) '.
 
- 			$sSQL = 
- 			'INSERT INTO motor_heisenberg.fuel_gasbuddy  '.
- 			'(site, tran, keyIn, veh, dept, emp, dept2, DATE, TIME, pu, pr, ta, trans, cum_veh,  '.
- 			'cum_emp, odom, miles, err, filename, counter, paid) '.
-
- 			'SELECT f.* FROM Motor_Mysql.SITable t '.
- 			'LEFT JOIN Motor_Mysql.SIFuel  s ON t.invoiceNum = s.invoiceNum  '.
- 			'LEFT JOIN Motor_Mysql.fuel_gasbuddy f ON s.time = f.time AND s.tranNum = f.tran AND s.date = f.date  '.
- 			'WHERE SIRun = '. $sSIRun .' '.
- 			// AND processed IS NOT NULL 
- 			'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
- 			'GROUP BY f.counter ';
-	    	$sql = DB::connection('mysql_motor')->update($sSQL);
+	 			'SELECT f.* FROM Motor_Mysql.SITable t '.
+	 			'LEFT JOIN Motor_Mysql.SIFuel  s ON t.invoiceNum = s.invoiceNum  '.
+	 			'LEFT JOIN Motor_Mysql.fuel_gasbuddy f ON s.time = f.time AND s.tranNum = f.tran AND s.date = f.date  '.
+	 			'WHERE SIRun = '. $sSIRun .' '.
+	 			// AND processed IS NOT NULL 
+	 			'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
+	 			'GROUP BY f.counter ';
+		    	$sql = DB::connection('mysql_motor')->update($sSQL);
 
 
- 			$sSQL = 
- 			'INSERT INTO motor_heisenberg.fuel_gasbuddy_payment  '.
- 			'(VIN, IOPay, campusOld, campus, dept, FRS, payment_type, payment, creditOld, gasboy_veh,  '.
- 			'gasboy_dept, startdate, enddate, detail, detail_comment, subdivide, charge_subdivide_by_itself,  '.
- 			'counter, editable, uneditableEndDate) '.
+	 			$sSQL = 
+	 			'INSERT INTO motor_heisenberg.fuel_gasbuddy_payment  '.
+	 			'(VIN, IOPay, campusOld, campus, dept, FRS, payment_type, payment, creditOld, gasboy_veh,  '.
+	 			'gasboy_dept, startdate, enddate, detail, detail_comment, subdivide, charge_subdivide_by_itself,  '.
+	 			'counter, editable, uneditableEndDate) '.
 
- 			'SELECT pay.* FROM Motor_Mysql.SIFuel sf  '.
- 			'LEFT JOIN Motor_Mysql.SITable s ON s.invoiceNum = sf.invoiceNum  '.
- 			'LEFT JOIN Motor_Mysql.fuel_gasbuddy_payment pay ON sf.date BETWEEN pay.startDate AND pay.endDate  '.
- 			'AND s.IOPay = pay.IOPay AND sf.VIN = pay.VIN  '.
- 			'WHERE SIRun = '. $sSIRun .' '.
- 			 // AND processed IS NOT NULL 
- 			'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
- 			'GROUP BY pay.counter ';
-	    	$sql = DB::connection('mysql_motor')->update($sSQL);
+	 			'SELECT pay.* FROM Motor_Mysql.SIFuel sf  '.
+	 			'LEFT JOIN Motor_Mysql.SITable s ON s.invoiceNum = sf.invoiceNum  '.
+	 			'LEFT JOIN Motor_Mysql.fuel_gasbuddy_payment pay ON sf.date BETWEEN pay.startDate AND pay.endDate  '.
+	 			'AND s.IOPay = pay.IOPay AND sf.VIN = pay.VIN  '.
+	 			'WHERE SIRun = '. $sSIRun .' '.
+	 			 // AND processed IS NOT NULL 
+	 			'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
+	 			'GROUP BY pay.counter ';
+		    	$sql = DB::connection('mysql_motor')->update($sSQL);
+	    	}
 
     	}
 
@@ -238,9 +239,9 @@ class testController extends Controller
 		
 		// temp skip locking
 		// if(0){
-$sqlString = 
-'UPDATE Gambino2Lock SET userID = NULL';
-$sql =  DB::connection('mysql_motor')->update($sqlString);
+// $sqlString = 
+// 'UPDATE Gambino2Lock SET userID = NULL';
+// $sql =  DB::connection('mysql_motor')->update($sqlString);
 
     	$sqlString = 
 		'SELECT gl.*, u.USER_ID uName FROM Gambino2Lock gl '.
@@ -287,6 +288,8 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 		' IF(IOPay.payment REGEXP "^[45][0-9]{5}$" = 1, "B", '.
 		' IF(IOPay.payment REGEXP "^[0-9]{6}$" = 1, "A", NULL))),NULL) FRStype '.
 		', billError, creditInvNum, cc.declined, cc.counter ccCounter '.
+			',IF(LOCATE(",", cc.CCName) >0, SUBSTRING_INDEX(cc.CCName, ",", 1), cc.CCName) lastName '.
+			',IF(LOCATE(",", cc.CCName) >0, SUBSTRING_INDEX(cc.CCName, ",", -1), cc.CCName) firstName '.		
 		'FROM '. $sSITableTable .' t '.
 		'LEFT JOIN IOPay on IOPay.counter = t.IOPay '.
 		'LEFT JOIN  '. $sSIRunTable .' on SIRun.counter = t.SIRun '.
@@ -432,8 +435,8 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 						$ccCaptureService->run = 'true';
 						$request->ccCaptureService = $ccCaptureService;
 						$billTo = new stdClass();
-						$billTo->firstName = $sName;
-						$billTo->lastName = $sName;
+						$billTo->firstName = $line->firstName;
+						$billTo->lastName = $line->lastName;
 						$billTo->street1 =$sStreetNum;
 						$billTo->city = $sCity;
 						$billTo->state = $sState;
@@ -650,9 +653,11 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 							  'WHERE invoiceNum = "'. $sInvoiceNum . '"';
 							}  
 							elseif($sType == 'Rental') {
-							  $sSQL = 'UPDATE renrec '.
-							  'SET BillDate = DATE(NOW()) '.
-							  'WHERE JOB_NUM = "'+ $sInvoiceNum + '"';
+							  if($sTesting != 'TRUE'){	
+								  $sSQL = 'UPDATE renrec '.
+								  'SET BillDate = DATE(NOW()) '.
+								  'WHERE JOB_NUM = "'. $sInvoiceNum . '"';
+							  }
 							}
 							elseif($sType == 'WorkOrder') {
 							  $sSQL = 'UPDATE workorders '.
@@ -665,7 +670,7 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 							}
 
 							  // Email
-							  $sSQL = 
+							$sSQL = 
 							'INSERT INTO  '. $sInvoiceEmailTable .' (InvType, email, body, filename, '.
 							  'Charge, InvoiceNum, BillDate, startDate, endDate, '.
 							  'emailFrom, emailCC, Subject) ';
@@ -682,13 +687,32 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 							  'WHERE invoiceNum = "'. $sInvoiceNum . '"';
 
 								$sql =  DB::connection('mysql_motor')->update($sSQL);
+							}
+							elseif($sType == 'Rental') {
+							  $sSQL = $sSQL .
+							  'SELECT "Rental", e.Email, "Body", CONCAT("Rental ", "'. $sInvoiceNum .'", ".pdf"), '.
+							  'bill.rSum, r.JOB_NUM, r.BillDate, r.startDate, r.endDate, '.
+							  '"MTSinvoices@mercury.umd.edu", '.
+							  '"MTSinvoices@mercury.umd.edu", '.
+							  '"Rental Invoice" '.
+							  'FROM renrec r '.
+							  'LEFT JOIN ( '.
+							  '   SELECT rentalno, SUM(quantity*rate) rSum '.
+							  '   FROM rentalbillinginfo WHERE rentalno = "'. $sInvoiceNum . '" '.
+							  ') bill ON r.JOB_NUM = bill.rentalno '.
+							  'LEFT JOIN IOPay_email e ON e.IOPay = r.IOPay '.
+							  'WHERE r.JOB_NUM = "'. $sInvoiceNum . '"';
 
+								$sql =  DB::connection('mysql_motor')->update($sSQL);
 
 							}
 
 
-
 						}
+
+
+
+
 
 		 			}
 		 		} 
@@ -701,7 +725,7 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 		 	}	
 		 	}
 
-
+		 	// dd("die");
 		 }  // foreach
 		 	
 		 // Update all of motor's records START
@@ -723,14 +747,17 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 		 }
 
 
-    		// '. $sGambino2Table .'
-	    	$sSIRunTable = 'motor_heisenberg.SIRun';
-	    	$sSITableTable = 'motor_heisenberg.SITable';
- 			$sCCchargeTable = 'motor_heisenberg.CCcharge';
- 			$sInvoiceEmailTable = 'motor_heisenberg.InvoiceEmail';
- 			$sfuel_gasbuddyTable = 'motor_heisenberg.fuel_gasbuddy';
- 			$sfuel_gasbuddy_paymentTable = 'motor_heisenberg.fuel_gasbuddy_payment';
- 			$sGambino2Table = 'motor_heisenberg.Gambino2';
+    // 		// '. $sGambino2Table .'
+	   //  	$sSIRunTable = 'motor_heisenberg.SIRun';
+	   //  	$sSITableTable = 'motor_heisenberg.SITable';
+ 			// $sCCchargeTable = 'motor_heisenberg.CCcharge';
+ 			// $sInvoiceEmailTable = 'motor_heisenberg.InvoiceEmail';
+ 			// $sfuel_gasbuddyTable = 'motor_heisenberg.fuel_gasbuddy';
+ 			// $sfuel_gasbuddy_paymentTable = 'motor_heisenberg.fuel_gasbuddy_payment';
+ 			// $sGambino2Table = 'motor_heisenberg.Gambino2';
+
+// $sRenrc = "motor_heisenberg.renrec";
+// $sRenecBilled = "motor_heisenberg.renrecBilled";
 
 		//motor_heisenberg.
 		 //else
@@ -757,6 +784,34 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 		    'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill")';
 		    $sql =  DB::connection('mysql_motor')->update($sSQL);
 		 }
+
+		if ($sTypeHold == 'Rental'){
+		 if($sTesting != 'TRUE'){	
+		    // set billdate for KFS
+		    $sSQL =
+		    'UPDATE SITable t '.
+		    'LEFT JOIN SIRun r ON t.SIRun = r.counter '.
+		    'LEFT JOIN renrecBilled rb ON rb.rennum = t.JOB_NUM '.
+		    // 'LEFT JOIN '.$srenrec.' ren ON ren.JOB_NUM = t.JOB_NUM '.
+		    'LEFT JOIN renrec ren ON ren.JOB_NUM = t.JOB_NUM '.
+		    'SET ren.BillDate = DATE(NOW()) '.
+		    'WHERE SIRun = '.$sSIRun.' AND processed IS NOT NULL '.
+		    'AND ToDo IN ("Manual Bill", "Never Bill") '.
+		    'AND rb.rennum IS NULL '.
+		    'AND r.typeOfInvoice = "Rental"';
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+
+		    $sSQL =
+		    'INSERT INTO renrecBilled (rennum) SELECT JOB_NUM FROM SITable t '.
+		    'LEFT JOIN SIRun r ON t.SIRun = r.counter '.
+		    'LEFT JOIN renrecBilled rb ON rb.rennum = t.JOB_NUM '.
+		    'WHERE SIRun = '.$sSIRun.' AND processed IS NOT NULL '.
+		    'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
+		    'AND rb.rennum IS NULL '.
+		    'AND r.typeOfInvoice = "Rental"';
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+		 }
+		}
 
 		  // Update all of motor's records END
 		 if (($sTypeHold == 'Fuel') or
