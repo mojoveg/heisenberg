@@ -128,9 +128,9 @@ class testController extends Controller
 
     	$sTesting = 'FALSE';
 
-    	$sTypeHold = 'Rental';
+    	$sTypeHold = 'Fuel';
     	$userID = 43;
-    	$sSIRun = 1249;
+    	$sSIRun = 1252;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -239,9 +239,9 @@ class testController extends Controller
 		
 		// temp skip locking
 		// if(0){
-// $sqlString = 
-// 'UPDATE Gambino2Lock SET userID = NULL';
-// $sql =  DB::connection('mysql_motor')->update($sqlString);
+$sqlString = 
+'UPDATE Gambino2Lock SET userID = NULL';
+$sql =  DB::connection('mysql_motor')->update($sqlString);
 
     	$sqlString = 
 		'SELECT gl.*, u.USER_ID uName FROM Gambino2Lock gl '.
@@ -397,6 +397,8 @@ class testController extends Controller
 					         $bTesting = 'FALSE';
 					         $sCreditInvNum = $line->creditInvNum;
 
+
+					     $sNum = $sInvoiceNum;
 					         if(($sType == 'Rental') or ($sType == 'WordOrder')){
 					         	$sNum = $line->tJobNum;
 					         } else {
@@ -418,7 +420,7 @@ class testController extends Controller
 
 
 
-		 				}
+		 				// }
 
 		 		// 	}
 		 		// } 
@@ -477,7 +479,8 @@ class testController extends Controller
 							$sType .'", "'.
 					        $sCharge .'", "'.
 					        $sCode .'", "'.
-					        $sInvoiceNum .'", "'.
+					        // $sInvoiceNum .'", "'.
+					        $sNum .'", "'.
 					        $sZip .'", "'.
 					        $sCardNum .'", "'.
 					        $sExpMonth .'", "'.
@@ -612,7 +615,8 @@ class testController extends Controller
 
 							$sSQL = 'UPDATE '. $sSITableTable .' '.
 							'SET billError = 1 '.
-							'WHERE invoiceNum = ' . $sInvoiceNum;
+							// 'WHERE invoiceNum = ' . $sInvoiceNum;
+							'WHERE invoiceNum = ' . $sNum;
 							$sql =  DB::connection('mysql_motor')->update($sSQL);
 
 							$sSQL = 
@@ -639,7 +643,8 @@ class testController extends Controller
 
 							$sSQL = 'UPDATE '. $sSITableTable .' '.
 							'SET processed = NOW() '.
-							'WHERE invoiceNum = ' . $sInvoiceNum;
+							// 'WHERE invoiceNum = ' . $sInvoiceNum;
+							'WHERE invoiceNum = ' . $sNum;
 							$sql =  DB::connection('mysql_motor')->update($sSQL);
 
 							// do we ever use this variable?
@@ -650,19 +655,22 @@ class testController extends Controller
 							if (($sType == 'Fuel') or ($sType == 'Carwash') or ($sType == 'FleetCard')) {
 							  $sSQL = 'UPDATE '. $sSITableTable .' '.
 							  'SET BillDate = DATE(NOW()) '.
-							  'WHERE invoiceNum = "'. $sInvoiceNum . '"';
+							  // 'WHERE invoiceNum = "'. $sInvoiceNum . '"';
+							  'WHERE invoiceNum = "'. $sNum . '"';
 							}  
 							elseif($sType == 'Rental') {
 							  if($sTesting != 'TRUE'){	
 								  $sSQL = 'UPDATE renrec '.
 								  'SET BillDate = DATE(NOW()) '.
-								  'WHERE JOB_NUM = "'. $sInvoiceNum . '"';
+								  // 'WHERE JOB_NUM = "'. $sInvoiceNum . '"';
+								  'WHERE JOB_NUM = "'. $sNum . '"';
 							  }
 							}
 							elseif($sType == 'WorkOrder') {
 							  $sSQL = 'UPDATE workorders '.
 							  'SET billDate = DATE(NOW()) '.
-							  'WHERE wonumber = "'. $sInvoiceNum . '"';
+							  // 'WHERE wonumber = "'. $sInvoiceNum . '"';
+							  'WHERE wonumber = "'. $sNum . '"';
 							}
 							if(($sType == 'Fuel') or ($sType == 'Carwash') or ($sType == 'FleetCard') or
 							  ($sType == 'Rental') or ($sType == 'WorkOrder')) {
@@ -684,13 +692,15 @@ class testController extends Controller
 							  'FROM '. $sSITableTable .' t '.
 							  'LEFT JOIN SIRun r ON r.counter = t.SIRun '.
 							  'LEFT JOIN IOPay_email e ON e.IOPay = t.IOPay '.
-							  'WHERE invoiceNum = "'. $sInvoiceNum . '"';
+							  // 'WHERE invoiceNum = "'. $sInvoiceNum . '"';
+							  'WHERE invoiceNum = "'. $sNum . '"';
 
 								$sql =  DB::connection('mysql_motor')->update($sSQL);
 							}
 							elseif($sType == 'Rental') {
 							  $sSQL = $sSQL .
-							  'SELECT "Rental", e.Email, "Body", CONCAT("Rental ", "'. $sInvoiceNum .'", ".pdf"), '.
+							  // 'SELECT "Rental", e.Email, "Body", CONCAT("Rental ", "'. $sInvoiceNum .'", ".pdf"), '.
+							  'SELECT "Rental", e.Email, "Body", CONCAT("Rental ", "'. $sNum .'", ".pdf"), '.
 							  'bill.rSum, r.JOB_NUM, r.BillDate, r.startDate, r.endDate, '.
 							  '"MTSinvoices@mercury.umd.edu", '.
 							  '"MTSinvoices@mercury.umd.edu", '.
@@ -698,10 +708,12 @@ class testController extends Controller
 							  'FROM renrec r '.
 							  'LEFT JOIN ( '.
 							  '   SELECT rentalno, SUM(quantity*rate) rSum '.
-							  '   FROM rentalbillinginfo WHERE rentalno = "'. $sInvoiceNum . '" '.
+							  // '   FROM rentalbillinginfo WHERE rentalno = "'. $sInvoiceNum . '" '.
+							  '   FROM rentalbillinginfo WHERE rentalno = "'. $sNum . '" '.
 							  ') bill ON r.JOB_NUM = bill.rentalno '.
 							  'LEFT JOIN IOPay_email e ON e.IOPay = r.IOPay '.
-							  'WHERE r.JOB_NUM = "'. $sInvoiceNum . '"';
+							  // 'WHERE r.JOB_NUM = "'. $sInvoiceNum . '"';
+							  'WHERE r.JOB_NUM = "'. $sNum . '"';
 
 								$sql =  DB::connection('mysql_motor')->update($sSQL);
 
@@ -709,6 +721,9 @@ class testController extends Controller
 
 
 						}
+
+
+					}
 
 
 
