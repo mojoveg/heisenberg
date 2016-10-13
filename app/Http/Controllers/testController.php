@@ -128,9 +128,9 @@ class testController extends Controller
 
     	$sTesting = 'FALSE';
 
-    	$sTypeHold = 'Fuel';
+    	$sTypeHold = 'Rental';
     	$userID = 43;
-    	$sSIRun = 1252;
+    	$sSIRun = 1259;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -239,9 +239,9 @@ class testController extends Controller
 		
 		// temp skip locking
 		// if(0){
-$sqlString = 
-'UPDATE Gambino2Lock SET userID = NULL';
-$sql =  DB::connection('mysql_motor')->update($sqlString);
+// $sqlString = 
+// 'UPDATE Gambino2Lock SET userID = NULL';
+// $sql =  DB::connection('mysql_motor')->update($sqlString);
 
     	$sqlString = 
 		'SELECT gl.*, u.USER_ID uName FROM Gambino2Lock gl '.
@@ -643,8 +643,8 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 
 							$sSQL = 'UPDATE '. $sSITableTable .' '.
 							'SET processed = NOW() '.
-							// 'WHERE invoiceNum = ' . $sInvoiceNum;
-							'WHERE invoiceNum = ' . $sNum;
+							'WHERE invoiceNum = ' . $sInvoiceNum;
+							// 'WHERE invoiceNum = ' . $sNum;
 							$sql =  DB::connection('mysql_motor')->update($sSQL);
 
 							// do we ever use this variable?
@@ -714,6 +714,32 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 							  'LEFT JOIN IOPay_email e ON e.IOPay = r.IOPay '.
 							  // 'WHERE r.JOB_NUM = "'. $sInvoiceNum . '"';
 							  'WHERE r.JOB_NUM = "'. $sNum . '"';
+
+								$sql =  DB::connection('mysql_motor')->update($sSQL);
+
+							}
+
+							elseif($sType == 'WorkOrder') {
+							  $sSQL = $sSQL .
+					            'SELECT "WorkOrder", e.Email, "Body", CONCAT("WorkOrder ", "'. $sNum . '", ".pdf"), '.
+					            'IF(work.scharge IS NULL, 0, work.scharge) + IF(parts.scharge IS NULL, 0, parts.scharge) AS wBill, '.
+					            'w.wonumber, w.BillDate, w.startDate, w.dateout, '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"Maintenance Invoice" '.
+					            'FROM workorders w '.
+					            'LEFT JOIN ( '.
+					            '  SELECT wonumber, SUM(hours*cost) AS scost, SUM(hours*charge) AS scharge '.
+					            '  FROM wowork '.
+					            '  GROUP BY wonumber '.
+					            ') work ON work.wonumber = w.wonumber '.
+					            'LEFT JOIN ( '.
+					            '  SELECT SUM(quantity * cost) AS scost, SUM(quantity * charge) AS scharge, wonumber '.
+					            '  FROM woparts '.
+					            '  GROUP BY wonumber '.
+					            ') parts ON parts.wonumber = w.wonumber '.
+					            'LEFT JOIN IOPay_email e ON e.IOPay = w.IOPay '.
+					            'WHERE w.wonumber = "'. $sNum . '"';
 
 								$sql =  DB::connection('mysql_motor')->update($sSQL);
 
@@ -824,6 +850,33 @@ $sql =  DB::connection('mysql_motor')->update($sqlString);
 		    'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
 		    'AND rb.rennum IS NULL '.
 		    'AND r.typeOfInvoice = "Rental"';
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+		 }
+		}
+
+		if ($sTypeHold == 'WorkOrder'){
+		 if($sTesting != 'TRUE'){	
+		    // set billdate for KFS
+		    $sSQL =
+		      'UPDATE SITable t '.
+		      'LEFT JOIN SIRun r ON t.SIRun = r.counter '.
+		      'LEFT JOIN workorderBilled rb ON rb.wonum = t.JOB_NUM '.
+		      'LEFT JOIN workorders w ON w.wonumber = rb.wonum '.
+		      'SET w.BillDate = DATE(NOW()) '.
+		      'WHERE SIRun = '.$sSIRun.' AND processed IS NOT NULL '.
+		      'AND ToDo IN ("Manual Bill", "Never Bill") '.
+		      'AND rb.wonum IS NULL '.
+		      'AND r.typeOfInvoice = "WorkOrder"';
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+
+		    $sSQL =
+		      'INSERT INTO workorderBilled (wonum) SELECT JOB_NUM FROM SITable t '.
+		      'LEFT JOIN SIRun r ON t.SIRun = r.counter '.
+		      'LEFT JOIN workorderBilled rb ON rb.wonum = t.JOB_NUM '.
+		      'WHERE SIRun = '.$sSIRun.' AND processed IS NOT NULL '.
+		      'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill") '.
+		      'AND rb.wonum IS NULL '.
+		      'AND r.typeOfInvoice = "WorkOrder"';
 		    $sql =  DB::connection('mysql_motor')->update($sSQL);
 		 }
 		}
