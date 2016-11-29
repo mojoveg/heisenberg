@@ -128,9 +128,9 @@ class testController extends Controller
 
     	$sTesting = 'FALSE';
 
-    	$sTypeHold = 'Rental';
+    	$sTypeHold = 'Fuel';
     	$userID = 43;
-    	$sSIRun = 1259;
+    	$sSIRun = 1281;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -297,6 +297,17 @@ class testController extends Controller
 			'LEFT JOIN motor_heisenberg.IOCC_D cc on IOPay.payment = cc.counter and IOPay.paymentType = "Credit" '.
 		'where t.SIRun = "'. $sSIRun .'" '.
 		'ORDER BY woFlag, IOPay.paymentType, cc.CCName, IOPay.payment, tJobNum, invoiceNum';
+
+			// SQL statement save
+		 	$sSQL2 = 
+		 	'INSERT INTO  motor_heisenberg.sqlStatements '.
+		 	'(statement, type, SIRun) '.
+		 	'values (\''.
+		 	$sSQL .'\', "'.
+		 	$sTypeHold .'", "'.
+		 	$sSIRun .'")';
+		 	$sql =  DB::connection('mysql_motor')->update($sSQL2);
+
 
 		$SITableQry =  DB::connection('mysql_motor')->select($sSQL);
 
