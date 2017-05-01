@@ -128,9 +128,10 @@ class testController extends Controller
 
     	$sTesting = 'FALSE';
 
-    	$sTypeHold = 'Fuel';
+    	//$sTypeHold = 'Insurance';
+    	$sTypeHold = 'WorkOrder';
     	$userID = 43;
-    	$sSIRun = 1281;
+    	$sSIRun = 1342;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -446,6 +447,7 @@ class testController extends Controller
 						$request->ccAuthService = $ccAuthService;
 						$ccCaptureService = new stdClass();
 						$ccCaptureService->run = 'true';
+							$ccCaptureService->purchasingLevel = 2;
 						$request->ccCaptureService = $ccCaptureService;
 						$billTo = new stdClass();
 						$billTo->firstName = $line->firstName;
@@ -467,6 +469,12 @@ class testController extends Controller
 						$purchaseTotals->currency = 'USD';
 						$purchaseTotals->grandTotalAmount = $sCharge;
 						$request->purchaseTotals = $purchaseTotals;
+
+						//$ccCaptureService->purchasingLevel 
+						// level 2 invoice number
+						$invoiceHeader = new stdClass();
+						$invoiceHeader->userPo = $sNum;
+						$request->invoiceHeader = $invoiceHeader;
 
 						// dd($request);
 						// echo '<pre>';
@@ -570,6 +578,7 @@ class testController extends Controller
 						}
 
 						// Build a capture using the request ID in the response as the auth request ID
+						/*
 						$ccCaptureService = new stdClass();
 						$ccCaptureService->run = 'true';
 						$ccCaptureService->authRequestID = $reply->requestID;
@@ -587,7 +596,7 @@ class testController extends Controller
 						print("Code: ". $result_codes[$reply->reasonCode] . "\n");
 
 						echo '</pre>';
-
+						*/
 						// sql breadcrumb 
 						$debugCount = $debugCount +1;
 						$sSQL = 
@@ -663,7 +672,8 @@ class testController extends Controller
 
 
 							//email
-							if (($sType == 'Fuel') or ($sType == 'Carwash') or ($sType == 'FleetCard')) {
+							if (($sType == 'Fuel') or ($sType == 'Carwash') or ($sType == 'FleetCard')
+							or ($sType == 'Propane')) {
 							  $sSQL = 'UPDATE '. $sSITableTable .' '.
 							  'SET BillDate = DATE(NOW()) '.
 							  // 'WHERE invoiceNum = "'. $sInvoiceNum . '"';
@@ -693,7 +703,7 @@ class testController extends Controller
 							'INSERT INTO  '. $sInvoiceEmailTable .' (InvType, email, body, filename, '.
 							  'Charge, InvoiceNum, BillDate, startDate, endDate, '.
 							  'emailFrom, emailCC, Subject) ';
-							if($sType == 'Fuel') {
+							if(($sType == 'Fuel') or ($sType == 'Propane')) {
 							  $sSQL = $sSQL .
 							  'SELECT "Fuel", e.Email, "Body", CONCAT("Fuel ", t.invoiceNum, ".pdf"), '.
 							  't.totalCharge, t.invoiceNum, t.BillDate, r.startDate, r.endDate, '.
@@ -708,6 +718,35 @@ class testController extends Controller
 
 								$sql =  DB::connection('mysql_motor')->update($sSQL);
 							}
+				            elseif($sType == 'Carwash') {
+					            $sSQL = $sSQL .
+					            'SELECT "Carwash", e.Email, "Body", CONCAT("Carwash ", t.invoiceNum, ".pdf"), '.
+					            't.totalCharge, t.invoiceNum, t.BillDate, r.startDate, r.endDate, '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"Carwash Invoice" '.
+					            'FROM SITable t '.
+					            'LEFT JOIN SIRun r ON r.counter = t.SIRun '.
+					            'LEFT JOIN IOPay_email e ON e.IOPay = t.IOPay '.
+							    'WHERE invoiceNum = "'. $sNum . '"';
+
+								$sql =  DB::connection('mysql_motor')->update($sSQL);
+							}
+				            elseif($sType == 'FleetCard') {
+					            $sSQL = $sSQL .
+					            'SELECT "FleetCard", e.Email, "Body", CONCAT("FleetCard ", t.invoiceNum, ".pdf"), '.
+					            't.totalCharge, t.invoiceNum, t.BillDate, r.startDate, r.endDate, '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"MTSinvoices@mercury.umd.edu", '.
+					            '"FleetCard Invoice" '.
+					            'FROM SITable t '.
+					            'LEFT JOIN SIRun r ON r.counter = t.SIRun '.
+					            'LEFT JOIN IOPay_email e ON e.IOPay = t.IOPay '.
+					            // 'WHERE invoiceNum = "'. sInvoiceNum . '"';
+							  'WHERE invoiceNum = "'. $sNum . '"';
+
+								$sql =  DB::connection('mysql_motor')->update($sSQL);
+					        }
 							elseif($sType == 'Rental') {
 							  $sSQL = $sSQL .
 							  // 'SELECT "Rental", e.Email, "Body", CONCAT("Rental ", "'. $sInvoiceNum .'", ".pdf"), '.
@@ -836,6 +875,26 @@ class testController extends Controller
 		    'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill")';
 		    $sql =  DB::connection('mysql_motor')->update($sSQL);
 		 }
+
+		 if ($sTypeHold == 'FleetCard'){
+		      // Set the FleetCard item to paid
+		      $sSQL = 'UPDATE SITable t '.
+		      'LEFT JOIN SIFleetCard s ON t.invoiceNum = s.invoiceNum '.
+		      'set s.paid = "T" '.
+		      'where SIRun = '. $sSIRun.
+		      ' AND processed IS NOT NULL '.
+		      'AND ToDo IN ("To Bill", "Manual Bill", "Never Bill")';
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+
+		      // this is where you would set the ezpass billing info to uneditable
+
+		      // Set the whole run of bills to paid
+		      $sSQL = 'update SIRun '.
+		      'set paid = "T" '.
+		      'where counter = '. $sSIRun;
+		    $sql =  DB::connection('mysql_motor')->update($sSQL);
+
+		 } 
 
 		if ($sTypeHold == 'Rental'){
 		 if($sTesting != 'TRUE'){	
