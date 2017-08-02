@@ -129,9 +129,9 @@ class testController extends Controller
     	$sTesting = 'FALSE';
 
     	//$sTypeHold = 'Insurance';
-    	$sTypeHold = 'WorkOrder';
+    	$sTypeHold = 'Fuel';
     	$userID = 43;
-    	$sSIRun = 1342;
+    	$sSIRun = 1390;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
