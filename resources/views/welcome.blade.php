@@ -22,6 +22,9 @@
                 <div class="panel-body">
                     <a href="{{ url('/gambino3') }}">Gambino</a>
                 </div>
+                <div class="panel-body">
+                    <a href="{{ url('/gambino4') }}">Gambino4</a>
+                </div>                
             </div>
         </div>
     </div>

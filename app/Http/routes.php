@@ -75,6 +75,8 @@ Route::get('gambino2', 'testController@gambino2');
 
 Route::get('gambino3', 'testController@gambino3');
 
+Route::get('gambino4', 'testController@gambino4');
+
 Route::post('gambino3/bill', 'testController@gambino3Bill');
 
 Route::get('lol', function () {

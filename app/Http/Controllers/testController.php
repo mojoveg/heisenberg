@@ -122,6 +122,19 @@ class testController extends Controller
     	return view('gambino.index', ['invoices' => $invoices]);
     }
 
+    public function gambino4()
+    {
+    	$invoices = DB::connection('mysql_motor')->select(
+    		'SELECT descriptor, iteration from Gambino2 WHERE processedLVL IN ("some", "none") ORDER BY counter DESC'    	
+    		);
+
+    	// return $typeOfInvoices;
+
+    	return view('gambino.index4', ['invoices' => $invoices]);
+    }
+
+    
+
     public function gambino3Bill(Request $request)
     {
     	$sTesting = 'TRUE';
@@ -131,7 +144,7 @@ class testController extends Controller
     	//$sTypeHold = 'Insurance';
     	$sTypeHold = 'Fuel';
     	$userID = 43;
-    	$sSIRun = 1390;
+    	$sSIRun = 1411;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -447,7 +460,7 @@ class testController extends Controller
 						$request->ccAuthService = $ccAuthService;
 						$ccCaptureService = new stdClass();
 						$ccCaptureService->run = 'true';
-							$ccCaptureService->purchasingLevel = 2;
+							$ccCaptureService->purchasingLevel = 3;
 						$request->ccCaptureService = $ccCaptureService;
 						$billTo = new stdClass();
 						$billTo->firstName = $line->firstName;
@@ -473,8 +486,44 @@ class testController extends Controller
 						//$ccCaptureService->purchasingLevel 
 						// level 2 invoice number
 						$invoiceHeader = new stdClass();
-						$invoiceHeader->userPo = $sNum;
+						#$invoiceHeader->userPo = $sNum;
+						$invoiceHeader->userPO = $sNum;
+						#$invoiceHeader->userPO = 'alNzlIqykJPo';
+						#$invoiceHeader->supplierOrderReference = 'MotorInvoice';
+						// removed 2017/09/11
+						#$invoiceHeader->supplierOrderReference = $sNum;
 						$request->invoiceHeader = $invoiceHeader;
+
+						$shipFrom = new stdClass();
+						$shipFrom->postalCode = '20742';
+						$request->shipFrom = $shipFrom;
+
+						$shipTo = new stdClass();
+						$shipTo->country = 'US';
+						$shipTo->postalCode = '20742';
+						$shipTo->state = 'MD';
+						$request->shipTo = $shipTo;
+
+						// item
+						$item1 = new stdClass();
+						$item1->id = '1';
+						#$item1->commodityCode;  // visa required mastercard optional
+						$item1->invoiceNumber = $sNum;
+						$item1->productCode = 'default';  // cybersource should / does auto populate this value to 'default'
+						$item1->productName = 'invoice';
+						#$item1->productSKU  // not needed if productCode = 'default'
+						$item1->quantity = 1;  // cybersource defualts to 1
+						$item1->unitOfMeasure = 'EA';  //unknown unit of measure
+						$item1->unitPrice = $sCharge;  //cybersource sets
+						//$request->item1 = $item1;
+						$request->item = array($item1);
+
+
+
+
+
+
+
 
 						// dd($request);
 						// echo '<pre>';
@@ -645,6 +694,8 @@ class testController extends Controller
 							'SET declined = "T" '.
 							'WHERE counter = ' . $line->ccCounter;
 							$sql =  DB::connection('mysql_motor')->update($sSQL);
+
+#break;							
 
 						}
 						else {
