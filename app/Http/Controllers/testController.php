@@ -144,7 +144,7 @@ class testController extends Controller
     	//$sTypeHold = 'Insurance';
     	$sTypeHold = 'Fuel';
     	$userID = 43;
-    	$sSIRun = 1411;
+    	$sSIRun = 1484;
 
     	$sSIRunTable = 'SIRun';
     	$sSITableTable = 'SITable';
@@ -514,6 +514,8 @@ class testController extends Controller
 						#$item1->productSKU  // not needed if productCode = 'default'
 						$item1->quantity = 1;  // cybersource defualts to 1
 						$item1->unitOfMeasure = 'EA';  //unknown unit of measure
+						#$item1->unitPrice = $sCharge - .01;  //cybersource sets
+						#$item1->taxAmount = .01;
 						$item1->unitPrice = $sCharge;  //cybersource sets
 						//$request->item1 = $item1;
 						$request->item = array($item1);
